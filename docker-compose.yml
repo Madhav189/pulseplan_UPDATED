@@ -1,0 +1,32 @@
+services:
+  # 1. Your Next.js Application
+  pulseplan-web:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    depends_on:
+      - pulseplan-db
+      - pulseplan-redis
+
+  # 2. A Dedicated Offline MySQL Database
+  pulseplan-db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=pulseplan_secret
+      - MYSQL_DATABASE=pulseplan_local
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # 3. A Dedicated Offline Redis Cache
+  pulseplan-redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+# This ensures your database doesn't wipe itself if you restart your computer
+volumes:
+  db_data:
